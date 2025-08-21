@@ -1,0 +1,95 @@
+/*
+  This file is for custom styles that complement Tailwind CSS.
+  - A custom, dark-themed scrollbar for a professional feel.
+  - A keyframe animation for the progress ring.
+  - A fade-in animation class for the results cards.
+*/
+
+/* Custom Dark Scrollbar for Webkit Browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a202c; /* bg-slate-900 */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #4a5568; /* border-color / slate-700 */
+  border-radius: 20px;
+  border: 3px solid #1a202c; /* bg-slate-900 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #718096; /* slate-500 */
+}
+
+/* Keyframe animation for the radial progress bar */
+@keyframes progress-animation {
+  from {
+    --progress-value: 0;
+  }
+}
+
+.progress-animate {
+  animation: progress-animation 1s ease-out forwards;
+}
+
+/* A simple fade-in animation for result cards */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Add these to your existing styles.css */
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.progress-animate {
+    animation: progressAnimation 1.5s ease-in-out forwards;
+}
+
+@keyframes progressAnimation {
+    from { stroke-dashoffset: 283; }
+}
+
+.role-pill {
+    @apply inline-block px-3 py-1 text-sm rounded-full;
+}
+
+.role-frontend {
+    @apply bg-blue-500/20 text-blue-300;
+}
+
+.role-backend {
+    @apply bg-green-500/20 text-green-300;
+}
+
+.role-fullstack {
+    @apply bg-purple-500/20 text-purple-300;
+}
+
+.role-devops {
+    @apply bg-orange-500/20 text-orange-300;
+}
+
+.role-data {
+    @apply bg-teal-500/20 text-teal-300;
+}
+
+.role-mobile {
+    @apply bg-pink-500/20 text-pink-300;
+}

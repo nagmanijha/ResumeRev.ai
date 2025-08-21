@@ -1,0 +1,13 @@
+2025-08-21 12:38:22 | INFO     | main:lifespan:23 - Application startup...
+2025-08-21 12:38:22 | INFO     | main:lifespan:26 - NLP models loaded and database tables checked/created.
+2025-08-21 12:38:22 | INFO     | main:analyze_resume:56 - Starting analysis for file: KomalKumari_InternshalaResume.pdf
+2025-08-21 12:38:23 | ERROR    | main:analyze_resume:82 - Error in /analyze/ endpoint: name 'SENTENCE_MODEL' is not defined
+2025-08-21 12:39:31 | INFO     | main:analyze_resume:56 - Starting analysis for file: KomalKumari_InternshalaResume.pdf
+2025-08-21 12:39:31 | ERROR    | main:analyze_resume:82 - Error in /analyze/ endpoint: name 'SENTENCE_MODEL' is not defined
+2025-08-21 12:42:02 | INFO     | main:analyze_resume:56 - Starting analysis for file: KomalKumari_InternshalaResume.pdf
+2025-08-21 12:42:02 | ERROR    | main:analyze_resume:82 - Error in /analyze/ endpoint: name 'SENTENCE_MODEL' is not defined
+2025-08-21 12:46:57 | INFO     | main:analyze_resume:56 - Starting analysis for file: KomalKumari_InternshalaResume.pdf
+2025-08-21 12:46:58 | ERROR    | main:analyze_resume:82 - Error in /analyze/ endpoint: name 'SENTENCE_MODEL' is not defined
+2025-08-21 12:54:29 | INFO     | main:analyze_resume:56 - Starting analysis for file: 23065136_Nagmani _Jha_sde (1).pdf
+2025-08-21 12:54:29 | ERROR    | main:analyze_resume:82 - Error in /analyze/ endpoint: name 'SENTENCE_MODEL' is not defined
+2025-08-21 17:10:45 | INFO     | main:lifespan:28 - Application shutdown...
