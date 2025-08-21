@@ -1,8 +1,3 @@
-Of course. Here is a professional and catchy `README.md` file for your finished project.
-
-You can copy and paste this directly into a `README.md` file in the root of your project folder.
-
------
 
 # 🚀 ResumeRev.ai
 
@@ -127,3 +122,4 @@ This project is built on a scalable foundation. Future improvements include:
 ## 📜 License
 
 This project is distributed under the MIT License. See `LICENSE` for more information.
+
