@@ -63,7 +63,7 @@ Follow these steps to get the application running on your local machine.
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/nagmanijha/ResumeRev.ai
 cd resume-parser
 
 # Create and activate a virtual environment
@@ -122,4 +122,5 @@ This project is built on a scalable foundation. Future improvements include:
 ## 📜 License
 
 This project is distributed under the MIT License. See `LICENSE` for more information.
+
 
