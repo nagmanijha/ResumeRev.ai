@@ -1,6 +1,0 @@
-2025-08-21 20:06:07 | INFO     | main:lifespan:23 - Application startup...
-2025-08-21 20:06:07 | INFO     | main:lifespan:26 - NLP models loaded and database tables checked/created.
-2025-08-21 20:06:07 | INFO     | main:analyze_resume:57 - Starting analysis for file: KomalKumari_InternshalaResume.pdf
-2025-08-21 20:06:16 | INFO     | main:analyze_resume:91 - Analysis complete for file: KomalKumari_InternshalaResume.pdf
-2025-08-21 20:06:30 | ERROR    | main:download_report:143 - Error in /download-report/ endpoint: Undefined font: B - Use built-in fonts or FPDF.add_font() beforehand
-2025-08-21 20:06:57 | INFO     | main:lifespan:28 - Application shutdown...

@@ -1,7 +1,0 @@
-2025-08-20 07:17:51 | INFO     | main:lifespan:28 - Application startup...
-2025-08-20 07:17:51 | INFO     | main:lifespan:33 - NLP models loaded and database tables checked/created.
-2025-08-20 07:21:50 | INFO     | main:analyze_resume:72 - Starting analysis for file: 23065136_Nagmani _Jha_sde (1).pdf
-2025-08-20 07:21:56 | ERROR    | main:analyze_resume:100 - Error in /analyze/ endpoint: (sqlite3.OperationalError) table analysis_results has no column named total_score
-[SQL: INSERT INTO analysis_results (filename, name, email, phone, total_score) VALUES (?, ?, ?, ?, ?) RETURNING id, timestamp]
-[parameters: ('23065136_Nagmani _Jha_sde (1).pdf', 'NAGMANI', 'nagmanijha31@gmail.com', '8789637604', 43.0)]
-(Background on this error at: https://sqlalche.me/e/20/e3q8)

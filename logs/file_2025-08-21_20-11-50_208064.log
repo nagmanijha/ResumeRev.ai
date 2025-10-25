@@ -1,9 +1,0 @@
-2025-08-21 20:11:50 | INFO     | main:lifespan:23 - Application startup...
-2025-08-21 20:11:50 | INFO     | main:lifespan:26 - NLP models loaded and database tables checked/created.
-2025-08-21 20:12:14 | INFO     | main:analyze_resume:57 - Starting analysis for file: 23065136_Nagmani _Jha_sde (1).pdf
-2025-08-21 20:12:19 | INFO     | main:analyze_resume:91 - Analysis complete for file: 23065136_Nagmani _Jha_sde (1).pdf
-2025-08-21 20:12:19 | INFO     | main:analyze_resume:57 - Starting analysis for file: KomalKumari_InternshalaResume.pdf
-2025-08-21 20:12:25 | INFO     | main:analyze_resume:91 - Analysis complete for file: KomalKumari_InternshalaResume.pdf
-2025-08-21 22:47:23 | INFO     | main:analyze_resume:57 - Starting analysis for file: 23065136_Nagmani _Jha_sde (1).pdf
-2025-08-21 22:47:29 | INFO     | main:analyze_resume:91 - Analysis complete for file: 23065136_Nagmani _Jha_sde (1).pdf
-2025-08-21 22:49:55 | INFO     | main:lifespan:28 - Application shutdown...

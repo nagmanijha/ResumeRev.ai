@@ -65,8 +65,6 @@ async def get_all_results(db: AsyncSession, skip: int = 0, limit: int = 20):
     result = await db.execute(query)
     return result.scalars().all()
 
-# Add this function to crud.py
-
 async def get_result_by_id(db: AsyncSession, analysis_id: int) -> models.AnalysisResult | None:
     """Fetches a single analysis result by its ID."""
     query = (

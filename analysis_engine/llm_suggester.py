@@ -82,7 +82,7 @@ def get_llm_suggestions(analysis_data: dict) -> list[str]:
 
     try:
         prompt = build_prompt(analysis_data)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
         response = model.generate_content(prompt)
         return clean_response(response.text)
     except Exception as e:
