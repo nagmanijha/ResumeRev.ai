@@ -1,7 +1,7 @@
 import logging
 from sklearn.feature_extraction.text import TfidfVectorizer
 from .model_manager import MODEL_MANAGER
-from sentence_transformers import util
+import sentence_transformers
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class SemanticMatcher:
 
         try:
             embeddings = self.model_manager.model.encode([resume_text, jd_text])
-            return util.cos_sim(embeddings[0], embeddings[1]).item() * 100
+            return sentence_transformers.util.cos_sim(embeddings[0], embeddings[1]).item() * 100
         except Exception as e:
             logger.error(f"Error in semantic matching: {e}")
             return self._calculate_tfidf_similarity(resume_text, jd_text)
@@ -38,7 +38,7 @@ class SemanticMatcher:
         try:
             jd_embedding = self.model_manager.model.encode(jd_text)
             scores = [
-                util.cos_sim(
+                sentence_transformers.util.cos_sim(
                     jd_embedding,
                     self.model_manager.model.encode(f"{e.get('title', '')} {e.get('description', '')}")
                 ).item()
@@ -59,7 +59,7 @@ class SemanticMatcher:
             for p in projects:
                 p_text = f"{p.get('title', '')} {p.get('description', '')}"
                 p_emb = self.model_manager.model.encode(p_text)
-                p['relevance_score'] = round(util.cos_sim(jd_embedding, p_emb).item() * 100)
+                p['relevance_score'] = round(sentence_transformers.util.cos_sim(jd_embedding, p_emb).item() * 100)
             return sorted(projects, key=lambda x: x['relevance_score'], reverse=True)
         except Exception as e:
             logger.error(f"Error in project relevance scoring: {e}")

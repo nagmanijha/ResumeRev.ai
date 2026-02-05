@@ -101,25 +101,94 @@ def generate_pdf_report(analysis_data: dict) -> bytes:
         parsed = analysis_data.get('parsed_data', {})
         score = analysis_data.get('ats_score', {})
         suggestions = analysis_data.get('suggestions', [])
+        skill_gap = score.get('skill_gap', {})
+        breakdown = score.get('breakdown', {})
 
-        # --- Summary Section ---
-        pdf.chapter_title('Overall Analysis')
+        # --- Candidate Info Section ---
+        pdf.chapter_title('Candidate Summary')
+        pdf.set_font(pdf.font_family, 'B', 11)
+        pdf.set_text_color(*COLOR_PRIMARY_TEXT)
+        pdf.cell(0, 8, f"Name: {parsed.get('name', 'N/A')}", 0, 1)
+        
+        contact = parsed.get('contact', {})
+        if contact.get('email'):
+            pdf.set_font(pdf.font_family, '', 10)
+            pdf.cell(0, 6, f"Email: {contact.get('email', 'N/A')}", 0, 1)
+        pdf.ln(5)
+
+        # --- Overall Score Section ---
+        pdf.chapter_title('Overall ATS Score')
+        pdf.draw_progress_bar(score.get('total_score', 0), label="Total Score")
+        pdf.ln(8)
+
+        # --- Score Breakdown ---
+        pdf.chapter_title('Score Breakdown')
         pdf.set_font(pdf.font_family, '', 10)
         pdf.set_text_color(*COLOR_PRIMARY_TEXT)
-        pdf.multi_cell(0, 6, f"This report provides a detailed analysis for the candidate '{parsed.get('name', 'N/A')}' based on the provided resume and job description.")
+        
+        breakdown_items = [
+            ("Skill Match", breakdown.get('skill_match', 0)),
+            ("Semantic Match", breakdown.get('semantic_match', 0)),
+            ("Experience Match", breakdown.get('experience_match', 0)),
+            ("Project Relevance", breakdown.get('project_match', 0)),
+        ]
+        
+        for label, val in breakdown_items:
+            pdf.cell(60, 7, f"  • {label}:", 0, 0)
+            pdf.set_font(pdf.font_family, 'B', 10)
+            pdf.cell(30, 7, f"{val}/100", 0, 1)
+            pdf.set_font(pdf.font_family, '', 10)
         pdf.ln(5)
-        pdf.draw_progress_bar(score.get('total_score', 0), label="Overall ATS Score")
-        pdf.ln(10)
+
+        # --- Skill Gap Analysis ---
+        pdf.chapter_title('Skill Gap Analysis')
+        pdf.set_font(pdf.font_family, '', 10)
+        
+        matched = skill_gap.get('matched', [])
+        missing = skill_gap.get('missing', [])
+        match_pct = skill_gap.get('match_percent', 0)
+        
+        pdf.set_text_color(*COLOR_PRIMARY_TEXT)
+        pdf.cell(0, 7, f"Match Rate: {round(match_pct)}%", 0, 1)
+        pdf.ln(3)
+        
+        # Matched Skills
+        pdf.set_font(pdf.font_family, 'B', 10)
+        pdf.set_text_color(34, 139, 34)  # Green
+        pdf.cell(0, 7, f"Matched Skills ({len(matched)}):", 0, 1)
+        pdf.set_font(pdf.font_family, '', 9)
+        pdf.set_text_color(*COLOR_PRIMARY_TEXT)
+        if matched:
+            pdf.multi_cell(0, 5, ", ".join(matched[:15]) + ("..." if len(matched) > 15 else ""))
+        else:
+            pdf.cell(0, 5, "None detected", 0, 1)
+        pdf.ln(3)
+        
+        # Missing Skills
+        pdf.set_font(pdf.font_family, 'B', 10)
+        pdf.set_text_color(220, 53, 69)  # Red
+        pdf.cell(0, 7, f"Missing Skills ({len(missing)}):", 0, 1)
+        pdf.set_font(pdf.font_family, '', 9)
+        pdf.set_text_color(*COLOR_PRIMARY_TEXT)
+        if missing:
+            pdf.multi_cell(0, 5, ", ".join(missing[:15]) + ("..." if len(missing) > 15 else ""))
+        else:
+            pdf.cell(0, 5, "All required skills present!", 0, 1)
+        pdf.ln(8)
 
         # --- AI Suggestions Section ---
-        pdf.chapter_title('AI-Powered Suggestions')
+        pdf.chapter_title('AI-Powered Recommendations')
         pdf.set_font(pdf.font_family, '', 10)
         pdf.set_text_color(*COLOR_PRIMARY_TEXT)
         if suggestions:
-            for i, suggestion in enumerate(suggestions):
-                # This multi_cell call will now work correctly with Unicode characters
-                pdf.multi_cell(0, 5, f"{i+1}. {suggestion}")
+            for i, suggestion in enumerate(suggestions[:5]):  # Limit to 5 suggestions
+                pdf.set_font(pdf.font_family, 'B', 10)
+                pdf.cell(8, 6, f"{i+1}.", 0, 0)
+                pdf.set_font(pdf.font_family, '', 10)
+                pdf.multi_cell(0, 5, suggestion)
                 pdf.ln(2)
+        else:
+            pdf.cell(0, 6, "No specific recommendations at this time.", 0, 1)
         
 
         return pdf.output()

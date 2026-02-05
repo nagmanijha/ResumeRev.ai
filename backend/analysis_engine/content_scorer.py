@@ -1,6 +1,6 @@
 import re
 import logging
-from config import SECTION_KEYWORDS
+from backend.config import SECTION_KEYWORDS
 
 logger = logging.getLogger(__name__)
 

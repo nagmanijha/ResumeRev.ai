@@ -1,7 +1,7 @@
 import re
 import logging
 from datetime import datetime
-from config import ACTION_VERBS
+from backend.config import ACTION_VERBS
 
 logger = logging.getLogger(__name__)
 

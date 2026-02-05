@@ -5,7 +5,7 @@ from .experience_analyzer import ExperienceAnalyzer
 from .content_scorer import ContentScorer
 from .semantic_matcher import SemanticMatcher
 from .role_analyzer import RoleAnalyzer
-from config import ATS_SCORE_WEIGHTS
+from backend.config import ATS_SCORE_WEIGHTS
 
 logger = logging.getLogger(__name__)
 
@@ -28,17 +28,34 @@ class ATSscorer:
             skill_match_data = self.skill_matcher.match_skills(resume_data.get('skills', []), job_skills)
             skill_score = skill_match_data['match_percent']
 
-            achievement_score = self.experience_analyzer.score_achievements(resume_text)
-            quality_score = self.content_scorer.score_content_quality(resume_text)
+            # Calculate Project Relevance (New V2 Metric)
+            project_score_data = self.score_project_relevance(resume_data, job_description)
+            project_scores = [p.get('relevance_score', 0) for p in project_score_data]
+            project_aggregate_score = sum(project_scores) / len(project_scores) if project_scores else 0
+
+            # Experience Relevance
             experience_score = self.semantic_matcher.score_experience_match(resume_data, job_description)
 
-            final_score = sum([
+            # Calculate weighted final score
+            raw_score = sum([
                 semantic_score * ATS_SCORE_WEIGHTS["semantic_match"],
                 skill_score * ATS_SCORE_WEIGHTS["skill_match"],
                 experience_score * ATS_SCORE_WEIGHTS["experience_match"],
-                achievement_score * ATS_SCORE_WEIGHTS["achievements"],
-                quality_score * ATS_SCORE_WEIGHTS["content_quality"]
+                project_aggregate_score * ATS_SCORE_WEIGHTS["project_match"]
             ])
+            
+            # Ensure score consistency: if skill match is high, score shouldn't be too low
+            # This prevents confusing scenarios like "100% skill match but 40 ATS score"
+            final_score = raw_score
+            if skill_score >= 90 and final_score < 70:
+                final_score = max(final_score, 70)  # Floor at 70 for high skill matches
+            elif skill_score >= 80 and final_score < 60:
+                final_score = max(final_score, 60)  # Floor at 60 for good skill matches
+
+            # Calculate impact factors for transparency
+            matched_count = len(skill_match_data.get('matched', []))
+            required_count = len(job_skills) if job_skills else 0
+            missing_count = len(skill_match_data.get('missing', []))
 
             return {
                 "total_score": round(final_score),
@@ -46,10 +63,17 @@ class ATSscorer:
                     "semantic_match": round(semantic_score),
                     "skill_match": round(skill_score),
                     "experience_match": round(experience_score),
-                    "achievements": round(achievement_score),
-                    "content_quality": round(quality_score)
+                    "project_match": round(project_aggregate_score)
                 },
-                "skill_gap": skill_match_data
+                "skill_gap": skill_match_data,
+                "context": {
+                    "skills_matched": matched_count,
+                    "skills_required": required_count,
+                    "skills_missing": missing_count,
+                    "experience_entries": len(resume_data.get('experience', [])),
+                    "projects_analyzed": len(project_scores),
+                    "score_adjusted": final_score != raw_score
+                }
             }
         except Exception as e:
             logger.error(f"Error calculating ATS score: {e}")

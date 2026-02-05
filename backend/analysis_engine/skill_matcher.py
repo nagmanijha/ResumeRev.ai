@@ -1,7 +1,8 @@
 import logging
 from rapidfuzz import process, fuzz
+from sentence_transformers import util
 from .model_manager import MODEL_MANAGER
-from config import SEMANTIC_SKILL_MATCH_THRESHOLD, FUZZY_SKILL_MATCH_THRESHOLD, MAX_SKILLS_TO_MATCH
+from backend.config import SEMANTIC_SKILL_MATCH_THRESHOLD, FUZZY_SKILL_MATCH_THRESHOLD, MAX_SKILLS_TO_MATCH
 
 logger = logging.getLogger(__name__)
 
@@ -11,8 +12,16 @@ class SkillMatcher:
         self.model_manager = model_manager
 
     def match_skills(self, resume_skills, job_skills):
+        # If no job skills were extracted, we can't calculate a meaningful match
+        # Return a neutral score that won't artificially inflate the ATS score
         if not job_skills:
-            return {"matched": resume_skills, "missing": [], "match_percent": 100}
+            return {
+                "matched": resume_skills if resume_skills else [],
+                "missing": [],
+                "match_percent": 0,
+                "extraction_failed": True,
+                "message": "Could not extract skills from job description"
+            }
         if not resume_skills:
             return {"matched": [], "missing": job_skills, "match_percent": 0}
 

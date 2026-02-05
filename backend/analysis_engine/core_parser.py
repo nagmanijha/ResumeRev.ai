@@ -58,60 +58,75 @@ def get_nlp():
 
 # --- Skill lists and alias mapping (canonical keys in SKILLS_LIST) ---
 SKILLS_LIST = [
-    "python",
-    "java",
-    "c++",
-    "c#",
-    "go",
-    "rust",
-    "javascript",
-    "typescript",
-    "html",
-    "css",
-    "sql",
-    "nosql",
-    "postgresql",
-    "mongodb",
-    "redis",
-    "git",
-    "docker",
-    "kubernetes",
-    "aws",
-    "azure",
-    "gcp",
-    "terraform",
-    "react",
-    "angular",
-    "vue",
-    "svelte",
-    "node.js",
-    "django",
-    "flask",
-    "fastapi",
-    "spring boot",
-    "machine learning",
-    "deep learning",
-    "data analysis",
-    "pandas",
-    "numpy",
-    "scikit-learn",
-    "tensorflow",
-    "pytorch",
-    "nlp",
-    "computer vision",
-    "agile",
-    "scrum",
-    "jira",
-    "rest api",
-    "graphql",
-    "microservices",
-    "cicd",
-    "jenkins",
-    "github actions",
-    "etl",
-    "data warehousing",
-    "apache spark",
+    # Programming Languages
+    "python", "java", "c++", "c#", "go", "rust", "javascript", "typescript",
+    "ruby", "php", "kotlin", "swift", "scala", "perl", "r", "matlab", "bash",
+    "shell", "powershell", "dart", "elixir", "haskell", "lua", "groovy",
+    
+    # Web Frontend
+    "html", "css", "sass", "scss", "less", "tailwind", "bootstrap", "jquery",
+    "react", "angular", "vue", "svelte", "next.js", "nuxt", "gatsby", "remix",
+    "webpack", "vite", "babel", "redux", "mobx", "zustand",
+    
+    # Web Backend & Frameworks
+    "node.js", "express", "nestjs", "django", "flask", "fastapi", "spring boot",
+    "spring", "rails", "laravel", "asp.net", ".net", "gin", "fiber", "phoenix",
+    
+    # Databases
+    "sql", "nosql", "postgresql", "mysql", "sqlite", "mongodb", "redis",
+    "elasticsearch", "cassandra", "dynamodb", "firebase", "supabase", "oracle",
+    "mariadb", "neo4j", "couchdb", "memcached",
+    
+    # Cloud & DevOps
+    "aws", "azure", "gcp", "docker", "kubernetes", "terraform", "ansible",
+    "jenkins", "gitlab ci", "github actions", "circleci", "travis ci",
+    "cloudformation", "pulumi", "helm", "argocd", "prometheus", "grafana",
+    "datadog", "new relic", "splunk", "elk stack", "nginx", "apache",
+    
+    # Data & ML/AI
+    "machine learning", "deep learning", "data analysis", "data science",
+    "pandas", "numpy", "scikit-learn", "tensorflow", "pytorch", "keras",
+    "nlp", "computer vision", "opencv", "spacy", "huggingface", "transformers",
+    "langchain", "llm", "generative ai", "rag", "vector database", "pinecone",
+    "matplotlib", "seaborn", "plotly", "tableau", "power bi", "looker",
+    "apache spark", "hadoop", "airflow", "kafka", "flink", "dbt",
+    "etl", "data warehousing", "snowflake", "databricks", "bigquery", "redshift",
+    
+    # APIs & Architecture
+    "rest api", "graphql", "grpc", "websocket", "microservices", "monolith",
+    "serverless", "lambda", "api gateway", "swagger", "openapi", "postman",
+    
+    # Testing & QA
+    "unit testing", "integration testing", "e2e testing", "jest", "mocha",
+    "pytest", "junit", "selenium", "cypress", "playwright", "testng",
+    "cucumber", "bdd", "tdd", "performance testing", "load testing",
+    
+    # Version Control & Collaboration
+    "git", "github", "gitlab", "bitbucket", "svn", "jira", "confluence",
+    "trello", "asana", "slack", "teams",
+    
+    # Methodologies
+    "agile", "scrum", "kanban", "waterfall", "devops", "devsecops", "sre",
+    "ci/cd", "cicd", "lean", "six sigma",
+    
+    # Security
+    "cybersecurity", "penetration testing", "owasp", "oauth", "jwt", "sso",
+    "saml", "encryption", "ssl", "tls", "firewalls", "siem",
+    
+    # Mobile Development
+    "android", "ios", "react native", "flutter", "xamarin", "cordova",
+    "ionic", "swiftui", "jetpack compose",
+    
+    # Other Technologies
+    "linux", "unix", "windows server", "macos", "virtualization", "vmware",
+    "blockchain", "solidity", "web3", "smart contracts", "nft",
+    "raspberry pi", "arduino", "iot", "embedded systems",
+    "3d modeling", "blender", "unity", "unreal engine", "game development",
+    "figma", "sketch", "adobe xd", "photoshop", "illustrator", "ui/ux",
+    "seo", "google analytics", "marketing automation", "salesforce", "hubspot",
+    "sap", "erp", "crm", "excel", "vba", "powerpoint", "word",
 ]
+
 
 # Aliases help detect alternate spellings / punctuation variants
 SKILLS_ALIASES = {
@@ -176,6 +191,8 @@ def extract_text_from_file(file_content: bytes, filename: str) -> str:
         if extension == ".docx":
             doc = docx.Document(io.BytesIO(file_content))
             text = "\n".join(para.text for para in doc.paragraphs)
+            if not text.strip():
+                raise ValueError("The parsed text is empty. The document might be image-based or protected.")
             return text
         elif extension == ".pdf":
             with pdfplumber.open(io.BytesIO(file_content)) as pdf:
@@ -184,12 +201,16 @@ def extract_text_from_file(file_content: bytes, filename: str) -> str:
                     try:
                         pages.append(page.extract_text() or "")
                     except Exception:
-                        # continue extracting remaining pages even if one page fails
                         logger.exception("Failed to extract text from a PDF page")
                         pages.append("")
-                return "\n".join(pages)
+                text = "\n".join(pages)
+                if not text.strip():
+                    raise ValueError("The parsed text is empty. This appears to be a scanned/image-based PDF, which is not supported without OCR.")
+                return text
         else:
             raise ValueError(f"Unsupported file format: {extension}")
+    except ValueError as ve:
+        raise ve
     except Exception as exc:
         logger.exception("Failed to extract text from %s", filename)
         raise ValueError(f"Could not read file: {filename}. It may be corrupted.") from exc
@@ -204,17 +225,19 @@ def extract_contact_info(text: str) -> Dict[str, Optional[str]]:
     # Prefer using phonenumbers if available for robust international parsing
     try:
         import phonenumbers
-
         for match in re.finditer(r'[\+\d][\d\-\s().]{6,}\d', text):
             candidate = match.group(0)
             try:
-                pn = phonenumbers.parse(candidate, None)
+                pn = phonenumbers.parse(candidate, "US") # Default region
                 if phonenumbers.is_possible_number(pn) and phonenumbers.is_valid_number(pn):
                     phone = phonenumbers.format_number(pn, phonenumbers.PhoneNumberFormat.E164)
                     break
             except Exception:
                 continue
+    except ImportError:
+        logger.warning("phonenumbers library not found. Falling back to simple regex.")
     except Exception:
+        pass # Fallback to regex
         # Fallback to a broader regex (less strict)
         phone_match = re.search(r'(?:\+?\d{1,3}[-.\s]?)?(?:\(?\d{2,4}\)?[-.\s]?)?\d{3,4}[-.\s]?\d{3,4}', text)
         phone = phone_match.group(0).strip() if phone_match else None

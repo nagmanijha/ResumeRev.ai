@@ -2,12 +2,12 @@
 # Defines the database schema using SQLAlchemy ORM.
 
 from sqlalchemy import (Column, Integer, String, Float, DateTime, ForeignKey, Table,
-                        UniqueConstraint)
+                        UniqueConstraint, JSON)
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql import func
 import re
 
-from database import Base
+from backend.database import Base
 
 analysis_skill_association = Table(
     'analysis_skill_association',
@@ -32,6 +32,7 @@ class AnalysisResult(Base):
     total_score = Column(Float, nullable=False)
     
     timestamp = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+    details = Column(JSON, nullable=True) # Store full analysis JSON (suggestions, projects, etc.)
 
     skills = relationship("Skill", secondary=analysis_skill_association, backref="analyses")
 

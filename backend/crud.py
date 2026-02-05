@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
-import models
+import backend.models as models
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,8 @@ async def create_analysis_result(db: AsyncSession, analysis_data: dict) -> model
             name=parsed_info.get('name'),
             email=parsed_info.get('contact', {}).get('email'),
             phone=parsed_info.get('contact', {}).get('phone'),
-            total_score=score
+            total_score=score,
+            details=analysis_data # Save the full JSON structure
         )
 
         skill_names = parsed_info.get('skills', [])

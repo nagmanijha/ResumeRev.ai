@@ -2,11 +2,10 @@
 
 # --- SCORING WEIGHTS ---
 ATS_SCORE_WEIGHTS = {
-    "semantic_match": 0.30,
-    "skill_match": 0.30,
-    "experience_match": 0.25,
-    "achievements": 0.10,
-    "content_quality": 0.05,
+    "semantic_match": 0.35,
+    "skill_match": 0.40,
+    "experience_match": 0.15,
+    "project_match": 0.10,
 }
 
 # --- THRESHOLDS ---

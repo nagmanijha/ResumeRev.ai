@@ -22,7 +22,21 @@ class AnalysisResult(BaseModel):
     total_score: float = Field(..., ge=0, le=100) # Add validation: score >= 0 and <= 100
     timestamp: datetime
     skills: List[Skill] = [] # A list of Skill objects
+    details: dict | None = None # Full analysis details
 
     class Config:
         # FIX: This is the crucial part that allows Pydantic to work with SQLAlchemy models.
         from_attributes = True
+
+# --- Batch Models (V2) ---
+
+class BatchItem(BaseModel):
+    filename: str
+    rank: int
+    scores: dict  # e.g. {"total": 88, "skills": 90}
+    missing_skills: List[str]
+
+class BatchAnalysisResponse(BaseModel):
+    batch_id: str
+    processed_count: int
+    results: List[BatchItem]

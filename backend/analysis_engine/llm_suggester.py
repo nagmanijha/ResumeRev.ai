@@ -7,13 +7,27 @@ from dotenv import load_dotenv # FIX: Add this import
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 import google.generativeai as genai
 
-# FIX: Add this line to load the .env file into the environment
-load_dotenv()
+from pathlib import Path
+
+# Load .env from backend directory or root
+current_dir = Path(__file__).resolve().parent
+# Try backend/.env (parent of analysis_engine is backend)
+env_path = current_dir.parent / '.env'
+if not env_path.exists():
+    # Try root/.env (parent of backend)
+    env_path = current_dir.parent.parent / '.env'
+
+load_dotenv(dotenv_path=env_path)
 
 logger = logging.getLogger(__name__)
 
-# Now, this line will correctly find the key from your .env file
 API_KEY = os.getenv("GEMINI_API_KEY")
+
+# DEBUG LOGGING
+if API_KEY:
+    logger.info(f"DEBUG: API Key found (Starts with {API_KEY[:4]}...)")
+else:
+    logger.warning(f"DEBUG: API Key NOT found. Checked path: {env_path}")
 
 if not API_KEY:
     logger.warning("GEMINI_API_KEY environment variable not set. LLM suggestions will be disabled.")
@@ -25,7 +39,7 @@ def build_prompt(data: dict) -> str:
     """Constructs the prompt for the LLM based on analysis data."""
     ats_score = data['ats_score']['total_score']
     missing_skills = data['skill_gap']['missing']
-    achievements_score = data['ats_score']['breakdown']['achievements']
+    achievements_score = data['ats_score']['breakdown'].get('achievements', 50)
     
     # Use a default skill if the list is empty to prevent errors
     example_skill = missing_skills[0] if missing_skills else "a required skill like Python or AWS"

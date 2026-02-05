@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ResumeRev.ai - AI Resume Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon"><span class="material-symbols-outlined">description</span></div>
+        <span class="logo-text">ResumeRev.ai</span>
+      </div>
+      <div class="mode-toggle" id="mode-toggle">
+        <button class="mode-btn applicant active" data-mode="applicant">
+          <span class="material-symbols-outlined">person</span> Applicant
+        </button>
+        <button class="mode-btn recruiter" data-mode="recruiter">
+          <span class="material-symbols-outlined">business</span> Recruiter
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <div class="hero">
+      <p>AI-powered resume intelligence. Get role-specific insights, match scores, and recruiter-ready suggestions in
+        seconds.</p>
+    </div>
+
+    <!-- ========== APPLICANT VIEW ========== -->
+    <div id="applicant-view" class="view-panel">
+      <div class="bento-grid">
+        <!-- LEFT COLUMN: Sticky Input Card (4 cols) -->
+        <div class="bento-sidebar">
+          <div class="card bento-card sticky-card">
+            <div class="card-header-icon">
+              <span class="material-symbols-outlined">upload_file</span>
+              <h3>Analyze Your Resume</h3>
+            </div>
+
+            <div class="form-group">
+              <label>Job Description</label>
+              <textarea id="job-description" rows="6" placeholder="Paste the job description here..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Upload Resume (.PDF or .DOCX)</label>
+              <div class="file-upload">
+                <button class="file-btn" id="file-btn">Choose File</button>
+                <span class="file-name" id="file-name">No file chosen</span>
+                <input type="file" id="resume-file" accept=".pdf,.docx" hidden />
+              </div>
+            </div>
+
+            <button id="analyze-btn" class="btn-primary">
+              <span class="material-symbols-outlined">bolt</span>
+              <span id="btn-text">Analyze Resume</span>
+              <span id="btn-spinner" class="spinner hidden"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Results Grid (8 cols) -->
+        <div class="bento-main" id="results-section">
+          <!-- Row 1: Stats (2 equal cards side-by-side) -->
+          <div class="bento-row bento-row-2" id="score-row" style="display:none;">
+            <div class="card bento-card score-section">
+              <div class="card-title">Overall ATS Score</div>
+              <div class="score-circle">
+                <svg viewBox="0 0 140 140">
+                  <circle class="score-bg" cx="70" cy="70" r="58" />
+                  <circle class="score-progress" id="score-ring" cx="70" cy="70" r="58" />
+                </svg>
+                <div class="score-value">
+                  <div class="score-number" id="score-number">0</div>
+                </div>
+              </div>
+              <div class="score-context" id="score-context"></div>
+            </div>
+            <div class="card bento-card skill-match-card">
+              <div class="card-title">JD Skill Match</div>
+              <div class="skill-match-value" id="skill-match-value">0%</div>
+              <div class="skill-match-label" id="skill-match-label">of required skills present</div>
+              <div class="skill-match-bar">
+                <div class="fill" id="skill-match-bar"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: AI Suggestions (full width) -->
+          <div class="bento-row" id="suggestions-card" style="display:none;">
+            <div class="card bento-card">
+              <div class="card-header-icon">
+                <span class="material-symbols-outlined">auto_awesome</span>
+                <h3>AI-Powered Suggestions</h3>
+              </div>
+              <ul class="suggestions-list" id="suggestions-list"></ul>
+              <div style="text-align:center;margin-top:16px;">
+                <button class="btn-outline btn-sm" id="download-btn">
+                  <span class="material-symbols-outlined">download</span> Download PDF
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: Skill Gap Analysis (full width) -->
+          <div class="bento-row" id="skills-card" style="display:none;">
+            <div class="card bento-card">
+              <div class="card-header-icon">
+                <span class="material-symbols-outlined">analytics</span>
+                <h3>Skill Gap Analysis</h3>
+              </div>
+              <div class="skills-grid">
+                <div class="skills-column">
+                  <h4 class="matched"><span class="material-symbols-outlined">check_circle</span> Matched</h4>
+                  <div class="chip-list" id="matched-skills"></div>
+                </div>
+                <div class="skills-column">
+                  <h4 class="missing"><span class="material-symbols-outlined">cancel</span> Missing</h4>
+                  <div class="chip-list" id="missing-skills"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4: Experience & Projects (2 equal cards side-by-side) -->
+          <div class="bento-row bento-row-2" id="exp-row" style="display:none;">
+            <div class="card bento-card">
+              <div class="card-header-icon">
+                <span class="material-symbols-outlined">work</span>
+                <h3>Experience</h3>
+              </div>
+              <div id="experience-list" class="scrollable-list"></div>
+            </div>
+            <div class="card bento-card">
+              <div class="card-header-icon">
+                <span class="material-symbols-outlined">folder</span>
+                <h3>Projects</h3>
+              </div>
+              <div id="projects-list" class="scrollable-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== RECRUITER VIEW ========== -->
+    <div id="recruiter-view" class="view-panel hidden">
+      <!-- Compact Header -->
+      <div class="command-header">
+        <div class="command-header-left">
+          <h1 class="command-title">Candidate Ranking</h1>
+          <span class="command-subtitle">AI-Powered Resume Analysis</span>
+        </div>
+        <div class="command-header-actions">
+          <button class="btn-ghost" id="share-btn">
+            <span class="material-symbols-outlined">share</span> Share
+          </button>
+          <button class="btn-ghost" id="rerun-btn">
+            <span class="material-symbols-outlined">refresh</span> Re-run
+          </button>
+        </div>
+      </div>
+
+      <!-- Job Info Bar -->
+      <div class="job-info-bar" id="job-info-bar" style="display:none">
+        <div class="job-info-item">
+          <span class="material-symbols-outlined">work</span>
+          <span id="header-role">-</span>
+        </div>
+        <div class="job-info-item">
+          <span class="material-symbols-outlined">badge</span>
+          <span id="header-id">-</span>
+        </div>
+      </div>
+
+      <!-- Two Column Unified Input Card -->
+      <div class="card command-card">
+        <div class="command-grid-internal">
+
+          <!-- JD Calibration Column (60%) -->
+          <div class="grid-column-calibration">
+            <div class="card-step-header">
+              <div class="step-title">
+                <span class="material-symbols-outlined step-icon">tune</span>
+                <span>Job Requirements Calibration</span>
+              </div>
+              <span class="step-pill">Step 1</span>
+            </div>
+            <div class="input-row">
+              <div class="input-group">
+                <label>Job Title</label>
+                <input type="text" id="input-role" placeholder="e.g. Senior Product Manager">
+              </div>
+              <div class="input-group input-sm">
+                <label>Job ID</label>
+                <input type="text" id="input-id" placeholder="PM-102">
+              </div>
+            </div>
+            <div class="input-group" style="flex:1; display:flex; flex-direction:column;">
+              <label>Requirements & Qualifications</label>
+              <textarea id="recruiter-jd" placeholder="Paste the job description, key skills, and requirements here..."
+                style="flex:1; min-height:200px;"></textarea>
+            </div>
+            <h2> </h2>
+            <button class="btn-primary btn-save" id="save-jd-btn" style="margin-top: 20px;">
+              <span class="material-symbols-outlined">save</span> Save JD Requirements
+            </button>
+          </div>
+
+          <!-- Divider -->
+          <div class="grid-divider"></div>
+
+          <!-- Resume Upload Column (40%) -->
+          <div class="grid-column-upload">
+            <div class="card-step-header">
+              <div class="step-title">
+                <span class="material-symbols-outlined step-icon">cloud_upload</span>
+                <span>Bulk Resume Upload</span>
+              </div>
+              <span class="step-pill">Step 2</span>
+            </div>
+            <div class="upload-zone" id="batch-drop-zone">
+              <input type="file" id="batch-upload-input" multiple accept=".pdf,.docx" hidden />
+              <span class="material-symbols-outlined upload-icon-lg">folder_open</span>
+              <div class="upload-text">Drop resumes here</div>
+              <div class="upload-hint">PDF or DOCX • Max 50 files</div>
+            </div>
+            <div id="file-count" class="file-count"></div>
+
+            <!-- File Queue (Progressive Disclosure) -->
+            <div id="file-queue" class="file-queue" style="display:none"></div>
+
+            <div class="progress-section" id="progress-section" style="display:none">
+              <div class="progress-info">
+                <span id="progress-text">Parsing resumes...</span>
+                <span id="progress-pct">0%</span>
+              </div>
+              <div class="progress-bar-sm">
+                <div class="fill" id="progress-fill"></div>
+              </div>
+            </div>
+            <button id="rank-btn" class="btn-primary btn-rank" disabled>
+              <span class="material-symbols-outlined" id="rank-icon">lock</span>
+              <span id="rank-btn-text">Rank Candidates</span>
+              <span id="rank-spinner" class="spinner hidden"></span>
+            </button>
+            <button id="stop-btn" class="btn-danger" style="display:none">
+              <span class="material-symbols-outlined">stop_circle</span>
+              <span>Stop Ranking</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Leaderboard Table -->
+      <div class="card command-card leaderboard-card" id="leaderboard-wrapper">
+        <div class="leaderboard-header">
+          <div class="leaderboard-title">
+            <span class="material-symbols-outlined">leaderboard</span>
+            <h3>Candidate Leaderboard</h3>
+          </div>
+          <!-- <div class="leaderboard-controls">
+            <div class="search-input">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" placeholder="Search candidates..." id="search-candidates" />
+            </div>
+            <select id="sort-candidates" class="sort-select">
+              <option value="score_desc">Score: High → Low</option>
+              <option value="score_asc">Score: Low → High</option>
+              <option value="match_desc">Match %: High → Low</option>
+              <option value="name_asc">Name: A → Z</option>
+            </select>
+          </div>
+        </div> -->
+          <div class="leaderboard-controls" style="display: flex; align-items: center; gap: 10px;">
+
+            <div class="search-input"
+              style="display: flex; align-items: center; height: 40px; border: 1px solid #ccc; border-radius: 14px; padding: 0 8px;">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" placeholder="Search candidates..." id="search-candidates"
+                style="border: 14px; outline: none; height: 100%; padding-left: 5px;" />
+            </div>
+
+            <select id="sort-candidates" class="sort-select"
+              style="height: 40px; border: 1px solid #ccc; border-radius: 12px; padding: 0 8px; box-sizing: border-box;">
+              <option value="score_desc">Score: High → Low</option>
+              <option value="score_asc">Score: Low → High</option>
+              <option value="match_desc">Match %: High → Low</option>
+              <option value="name_asc">Name: A → Z</option>
+            </select>
+
+          </div>
+          <div class="table-container">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Candidate</th>
+                  <th>ATS Score</th>
+                  <th>Match %</th>
+                  <th>Missing Skills</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboard-body">
+                <tr class="empty-row">
+                  <td colspan="6">
+                    <div class="empty-state-lg">
+                      <span class="material-symbols-outlined empty-icon-lg">people_outline</span>
+                      <div class="empty-title">No candidates yet</div>
+                      <div class="empty-hint">Complete Steps 1 & 2 to start ranking resumes</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination" id="pagination" style="display:none">
+            <span class="pagination-info" id="pagination-info">Showing 1–10 of 0</span>
+            <div class="pagination-btns">
+              <button id="prev-btn" class="page-btn" disabled>
+                <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+              <span id="page-display" class="page-current">1</span>
+              <button id="next-btn" class="page-btn">
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
