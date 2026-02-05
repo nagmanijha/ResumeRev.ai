@@ -684,11 +684,13 @@ function renderLeaderboard(results) {
                         <span class="score-cell">${r.score}/100</span>
                     </div>
                 </td>
-                <td><span class="match-cell" style="color:${r.match >= 80 ? 'var(--success)' : (r.match >= 50 ? 'var(--warning)' : 'var(--danger)')}">${r.match}%</span></td>
+                <td><span class="match-cell" style="color:${r.match >= 80 ? 'var(--success)' : (r.match >= 50 ? 'var(--warning)' : 'var(--danger)')}">${r.match || 0}%</span></td>
                 <td>
                     <div style="display:flex;gap:4px;flex-wrap:wrap">
-                        ${r.missing.slice(0, 2).map(s => `<span class="chip chip-danger" style="padding:2px 6px;font-size:10px">${s}</span>`).join('') || '<span class="chip chip-success" style="padding:2px 6px;font-size:10px">All Matched</span>'}
-                        ${r.missing.length > 2 ? `<span style="font-size:10px;color:var(--text-muted)">+${r.missing.length - 2}</span>` : ''}
+                        ${r.error
+                ? '<span class="chip chip-danger" style="padding:2px 6px;font-size:10px">Analysis Failed</span>'
+                : (r.missing || []).slice(0, 2).map(s => `<span class="chip chip-danger" style="padding:2px 6px;font-size:10px">${s}</span>`).join('') || '<span class="chip chip-success" style="padding:2px 6px;font-size:10px">All Matched</span>'}
+                        ${(r.missing || []).length > 2 ? `<span style="font-size:10px;color:var(--text-muted)">+${r.missing.length - 2}</span>` : ''}
                     </div>
                 </td>
                 <td>

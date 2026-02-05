@@ -88,7 +88,7 @@ def fallback_suggestions() -> list[str]:
         "Consider adding a professional summary at the top of your resume to highlight your key strengths."
     ]
 
-@retry(wait=wait_random_exponential(min=1, max=30), stop=stop_after_attempt(3))
+@retry(wait=wait_random_exponential(min=1, max=10), stop=stop_after_attempt(1))
 def get_llm_suggestions(analysis_data: dict) -> list[str]:
     """Generates actionable LLM suggestions from resume analysis data."""
     if not API_KEY:
@@ -96,8 +96,9 @@ def get_llm_suggestions(analysis_data: dict) -> list[str]:
 
     try:
         prompt = build_prompt(analysis_data)
-        model = genai.GenerativeModel('models/gemini-2.5-flash')
-        response = model.generate_content(prompt)
+        # Use a faster, lighter model and add timeout
+        model = genai.GenerativeModel('models/gemini-1.5-flash')
+        response = model.generate_content(prompt, request_options={'timeout': 10})
         return clean_response(response.text)
     except Exception as e:
         logger.error(f"Failed to get or parse LLM suggestions: {e}", exc_info=True)

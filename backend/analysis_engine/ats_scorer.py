@@ -110,32 +110,29 @@ class ATSscorer:
         return self.role_analyzer.calculate_seniority_level(resume_data, self.experience_analyzer)
 
 
+# Global instance
+ATS_SCORER = ATSscorer()
+
 # Global instance for backward compatibility
-def calculate_ats_score(resume_text, job_description, resume_data):
-    scorer = ATSscorer()
+def calculate_ats_score(resume_text, job_description, resume_data, scorer=ATS_SCORER):
     return scorer.calculate_ats_score(resume_text, job_description, resume_data)
 
 
-def rate_skill_levels(resume_data):
-    scorer = ATSscorer()
+def rate_skill_levels(resume_data, scorer=ATS_SCORER):
     return scorer.rate_skill_levels(resume_data)
 
 
-def score_project_relevance(resume_data, jd_text):
-    scorer = ATSscorer()
+def score_project_relevance(resume_data, jd_text, scorer=ATS_SCORER):
     return scorer.score_project_relevance(resume_data, jd_text)
 
 
-def calculate_role_suitability(resume_data, job_description):
-    scorer = ATSscorer()
+def calculate_role_suitability(resume_data, job_description, scorer=ATS_SCORER):
     return scorer.calculate_role_suitability(resume_data, job_description)
 
 
-def assess_industry_fit(resume_data, job_description):
-    scorer = ATSscorer()
+def assess_industry_fit(resume_data, job_description, scorer=ATS_SCORER):
     return scorer.assess_industry_fit(resume_data, job_description)
 
 
-def calculate_seniority_level(resume_data):
-    scorer = ATSscorer()
+def calculate_seniority_level(resume_data, scorer=ATS_SCORER):
     return scorer.calculate_seniority_level(resume_data)

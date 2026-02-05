@@ -191,7 +191,12 @@ def generate_pdf_report(analysis_data: dict) -> bytes:
             pdf.cell(0, 6, "No specific recommendations at this time.", 0, 1)
         
 
-        return pdf.output()
+        # fpdf 1.7.2 output() returns a string in Python 3 (latin-1 encoded)
+        # We must encode it to bytes for io.BytesIO and StreamingResponse
+        pdf_content = pdf.output(dest='S')
+        if isinstance(pdf_content, str):
+            return pdf_content.encode('latin-1')
+        return pdf_content
     except Exception as e:
         logger.error(f"Failed to generate PDF report: {e}", exc_info=True)
         # Fallback error PDF
@@ -199,4 +204,4 @@ def generate_pdf_report(analysis_data: dict) -> bytes:
         pdf.add_page()
         pdf.set_font('Arial', 'B', 12)
         pdf.cell(0, 10, 'Error: Could not generate the report.', 0, 1, 'C')
-        return pdf.output()
+        return pdf.output(dest='S').encode('latin-1')

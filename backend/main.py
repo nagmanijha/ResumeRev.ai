@@ -208,9 +208,11 @@ async def analyze_batch(
     batch_id = str(uuid.uuid4())
     logger.info(f"Starting batch analysis {batch_id} for {len(files)} files")
 
-    # Limit concurrency to 5 parallel tasks to prevent OOM
-    sem = asyncio.Semaphore(5)
+    # Limit concurrency to 2 parallel tasks to prevent OOM on 512MB instances
+    sem = asyncio.Semaphore(2)
 
+    import gc
+    
     async def _process_safe(file: UploadFile):
         async with sem:
             try:
@@ -223,7 +225,12 @@ async def analyze_batch(
                     return None
                     
                 content = await file.read()
-                return await run_in_threadpool(_analyze_single_resume_sync, content, file.filename, job_description)
+                result = await run_in_threadpool(_analyze_single_resume_sync, content, file.filename, job_description)
+                
+                # Explicitly free memory
+                del content
+                gc.collect()
+                return result
             except Exception as e:
                 logger.error(f"Async worker failed for {file.filename}: {e}")
                 return None
