@@ -16,8 +16,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     # Install CPU-only PyTorch first to avoid downloading 3GB+ CUDA wheels
     pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && \
-    pip install --no-cache-dir -r requirements.txt && \
-    python -m spacy download en_core_web_sm
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire project
 COPY . .
