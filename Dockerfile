@@ -1,11 +1,5 @@
-# Use Python 3.11 to ensure compatibility with spacy/blis wheels
-FROM python:3.11-slim
-
-# Install system build dependencies (fixes "gcc failed" errors for source builds)
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
+# Use full Python 3.11 image to include all standard libraries and build tools
+FROM python:3.11
 
 WORKDIR /app
 
@@ -13,8 +7,12 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    # Install CPU-only PyTorch first to avoid downloading 3GB+ CUDA wheels
+# 1. Upgrade build tools
+# 2. Pin numpy<2.0 to avoid compatibility issues with older libs (blis/spacy)
+# 3. Install CPU-only PyTorch
+# 4. Install remaining requirements
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir "numpy<2.0" && \
     pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && \
     pip install --no-cache-dir -r requirements.txt
 
